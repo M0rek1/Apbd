@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "Z:\\APBD\\task5\\task5\\task5\\task5.csproj": {}
+    "C:\\APBD\\apbd5\\Apbd\\task5\\task5.csproj": {}
   },
   "projects": {
-    "Z:\\APBD\\task5\\task5\\task5\\task5.csproj": {
+    "C:\\APBD\\apbd5\\Apbd\\task5\\task5.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "Z:\\APBD\\task5\\task5\\task5\\task5.csproj",
+        "projectUniqueName": "C:\\APBD\\apbd5\\Apbd\\task5\\task5.csproj",
         "projectName": "task5",
-        "projectPath": "Z:\\APBD\\task5\\task5\\task5\\task5.csproj",
-        "packagesPath": "C:\\Users\\s28214\\.nuget\\packages\\",
-        "outputPath": "Z:\\APBD\\task5\\task5\\task5\\obj\\",
+        "projectPath": "C:\\APBD\\apbd5\\Apbd\\task5\\task5.csproj",
+        "packagesPath": "C:\\Users\\mardi\\.nuget\\packages\\",
+        "outputPath": "C:\\APBD\\apbd5\\Apbd\\task5\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\s28214\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\mardi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -34,11 +38,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -48,6 +47,16 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.0-preview.3.24172.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.0-preview.3.24172.4, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -73,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
