@@ -1,78 +1,98 @@
-namespace task5.Properties;
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Data;
+using Microsoft.Data.SqlClient;
+using task5.Properties;
+
+namespace Lesson6.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class AnimalController : ControllerBase
 {
-    private readonly AnimalsContext _context;
+    private readonly string _dbConnectionString;
 
-    public AnimalController(AnimalsContext context)
+    public AnimalController(IConfiguration config)
     {
-        _context = context;
+        _dbConnectionString = config.GetConnectionString("DefaultConnection");
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Animal>>> GetAnimal([FromQuery] string orderBy = "name")
+    public async Task<ActionResult<IEnumerable<Animal>>> FetchAnimals([FromQuery] string sortBy = "name")
     {
-        IQueryable<Animal> query = _context.Animal;
+        var animalList = new List<Animal>();
+        var sqlQuery = $"SELECT * FROM Animal ORDER BY {sortBy}";
 
-        switch (orderBy.ToLower())
+        using (var dbConnection = new SqlConnection(_dbConnectionString))
         {
-            case "name":
-                query = query.OrderBy(a => a.Name);
-                break;
-            case "description":
-                query = query.OrderBy(a => a.Description);
-                break;
-            case "category":
-                query = query.OrderBy(a => a.Category);
-                break;
-            case "area":
-                query = query.OrderBy(a => a.Area);
-                break;
-            default:
-                return BadRequest("Invalid orderBy parameter");
+            using (var sqlCommand = new SqlCommand(sqlQuery, dbConnection))
+            {
+                await dbConnection.OpenAsync();
+                using (var dataReader = await sqlCommand.ExecuteReaderAsync())
+                {
+                    while (await dataReader.ReadAsync())
+                    {
+                        animalList.Add(new Animal
+                        {
+                            IdAnimal = dataReader.GetInt32("IdAnimal"),
+                            Name = dataReader.GetString("Name"),
+                            Description = dataReader.IsDBNull("Description") ? null : dataReader.GetString("Description"),
+                            Category = dataReader.GetString("Category"),
+                            Area = dataReader.GetString("Area")
+                        });
+                    }
+                }
+            }
         }
 
-        return await query.ToListAsync();
+        return Ok(animalList);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Animal>> PostAnimal(Animal animal)
+    public async Task<ActionResult<Animal>> CreateAnimal([FromBody] Animal newAnimal)
     {
-        _context.Animal.Add(animal);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAnimal), new { id = animal.IdAnimal }, animal);
+        var insertQuery = "INSERT INTO Animal (Name, Description, Category, Area) VALUES (@Name, @Description, @Category, @Area); " +
+                          "SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        using (var dbConnection = new SqlConnection(_dbConnectionString))
+        {
+            using (var sqlCommand = new SqlCommand(insertQuery, dbConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@Name", newAnimal.Name);
+                sqlCommand.Parameters.AddWithValue("@Description", newAnimal.Description ?? (object)DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@Category", newAnimal.Category);
+                sqlCommand.Parameters.AddWithValue("@Area", newAnimal.Area);
+
+                await dbConnection.OpenAsync();
+                newAnimal.IdAnimal = (int)await sqlCommand.ExecuteScalarAsync();
+            }
+        }
+
+        return CreatedAtAction(nameof(FetchAnimals), new { id = newAnimal.IdAnimal }, newAnimal);
     }
 
-
-   
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutAnimal(int id, Animal animal)
+    public async Task<IActionResult> UpdateAnimal(int id, [FromBody] Animal updatedAnimal)
     {
-        if (id != animal.IdAnimal)
-        {
+        if (id != updatedAnimal.IdAnimal)
             return BadRequest();
-        }
 
-        _context.Entry(animal).State = EntityState.Modified;
+        var updateQuery = "UPDATE Animal SET Name = @Name, Description = @Description, Category = @Category, Area = @Area WHERE IdAnimal = @IdAnimal";
 
-        try
+        using (var dbConnection = new SqlConnection(_dbConnectionString))
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.Animal.Any(e => e.IdAnimal == id))
+            using (var sqlCommand = new SqlCommand(updateQuery, dbConnection))
             {
-                return NotFound();
-            }
-            else
-            {
-                throw;
+                sqlCommand.Parameters.AddWithValue("@IdAnimal", updatedAnimal.IdAnimal);
+                sqlCommand.Parameters.AddWithValue("@Name", updatedAnimal.Name);
+                sqlCommand.Parameters.AddWithValue("@Description", updatedAnimal.Description ?? (object)DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@Category", updatedAnimal.Category);
+                sqlCommand.Parameters.AddWithValue("@Area", updatedAnimal.Area);
+
+                await dbConnection.OpenAsync();
+                var updateResult = await sqlCommand.ExecuteNonQueryAsync();
+
+                if (updateResult == 0)
+                    return NotFound();
             }
         }
 
@@ -80,16 +100,23 @@ public class AnimalController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAnimal(int id)
+    public async Task<IActionResult> RemoveAnimal(int id)
     {
-        var animal = await _context.Animal.FindAsync(id);
-        if (animal == null)
-        {
-            return NotFound();
-        }
+        var deleteQuery = "DELETE FROM Animal WHERE IdAnimal = @IdAnimal";
 
-        _context.Animal.Remove(animal);
-        await _context.SaveChangesAsync();
+        using (var dbConnection = new SqlConnection(_dbConnectionString))
+        {
+            using (var sqlCommand = new SqlCommand(deleteQuery, dbConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@IdAnimal", id);
+
+                await dbConnection.OpenAsync();
+                var deleteResult = await sqlCommand.ExecuteNonQueryAsync();
+
+                if (deleteResult == 0)
+                    return NotFound();
+            }
+        }
 
         return NoContent();
     }
