@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Qz+x56Fp5R2s3CL4L3e/aPAMg9RMNISpn/Z7DwXkpygs503uH5gfKxzdhROeYNu0m4swvyOqlfb6equBLH808g==",
+  "dgSpecHash": "nSIhqfjFd3pTIJMWOK5K7FhTAMEtDIWGgWh3nv4TiWWoVj0V0du+VfGOb/Ix8OAy2e5kPx48dGCT5jXXaKbYQA==",
   "success": true,
-  "projectFilePath": "C:\\APBD\\lab\\Apbd\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
+  "projectFilePath": "C:\\APBD\\lab6\\Apbd\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mardi\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.2\\microsoft.aspnetcore.openapi.8.0.2.nupkg.sha512",
     "C:\\Users\\mardi\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
