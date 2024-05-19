@@ -1,0 +1,5 @@
+C:\APBD\task7\Apbd\LinqCwiczenia 2\LinqTutorials\obj\Debug\net8.0\LinqTutorials.GeneratedMSBuildEditorConfig.editorconfig
+C:\APBD\task7\Apbd\LinqCwiczenia 2\LinqTutorials\obj\Debug\net8.0\LinqTutorials.AssemblyInfoInputs.cache
+C:\APBD\task7\Apbd\LinqCwiczenia 2\LinqTutorials\obj\Debug\net8.0\LinqTutorials.AssemblyInfo.cs
+C:\APBD\task7\Apbd\LinqCwiczenia 2\LinqTutorials\obj\Debug\net8.0\LinqTutorials.csproj.CoreCompileInputs.cache
+C:\APBD\task7\Apbd\LinqCwiczenia 2\LinqTutorials\obj\Debug\net8.0\LinqTutorials.sourcelink.json
