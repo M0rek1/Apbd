@@ -1,0 +1,7 @@
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.csproj.AssemblyReference.cache
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.GeneratedMSBuildEditorConfig.editorconfig
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.AssemblyInfoInputs.cache
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.AssemblyInfo.cs
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.csproj.CoreCompileInputs.cache
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.MvcApplicationPartsAssemblyInfo.cache
+C:\APBD\Task9\Apbd\Task09\Task09\obj\Debug\net5.0\Task09.sourcelink.json
