@@ -2,6 +2,7 @@ using Task09.Context;
 using Task09.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Task09.Services;
 
 namespace Task09.Controllers
 {
@@ -9,55 +10,22 @@ namespace Task09.Controllers
     [Route("api/[controller]")]
     public class PatientsController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IPatientService _patientService;
 
-        public PatientsController(ApplicationDbContext context)
+        public PatientsController(IPatientService patientService)
         {
-            this.context = context;
+            _patientService = patientService;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPatient(int id)
         {
-            var patient = await context.Patients
-                .Include(p => p.Prescriptions)
-                .ThenInclude(pr => pr.PrescriptionMedicaments)
-                .ThenInclude(pm => pm.Medicament)
-                .Include(p => p.Prescriptions)
-                .ThenInclude(pr => pr.Doctor)
-                .FirstOrDefaultAsync(p => p.IdPatient == id);
+            var response = await _patientService.GetPatientAsync(id);
 
-            if (patient == null)
+            if (response == null)
             {
                 return NotFound();
             }
-
-            var response = new GetPatientResponse
-            {
-                IdPatient = patient.IdPatient,
-                FirstName = patient.FirstName,
-                LastName = patient.LastName,
-                Birthdate = patient.Birthdate,
-                Prescriptions = patient.Prescriptions.Select(p => new PrescriptionResponse
-                {
-                    IdPrescription = p.IdPrescription,
-                    Date = p.Date,
-                    DueDate = p.DueDate,
-                    Doctor = new DoctorResponse
-                    {
-                        IdDoctor = p.Doctor.IdDoctor,
-                        FirstName = p.Doctor.FirstName,
-                        LastName = p.Doctor.LastName
-                    },
-                    Medicaments = p.PrescriptionMedicaments.Select(pm => new MedicamentResponse
-                    {
-                        IdMedicament = pm.Medicament.IdMedicament,
-                        Name = pm.Medicament.Name,
-                        Dose = pm.Dose,
-                        Description = pm.Details
-                    }).ToList()
-                }).OrderBy(pr => pr.DueDate).ToList()
-            };
 
             return Ok(response);
         }
