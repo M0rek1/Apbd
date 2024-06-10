@@ -2,101 +2,56 @@ using Task09.Context;
 using Task09.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Task09.Services;
+using Microsoft.AspNetCore.Authorization;
 namespace Task09.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class PrescriptionsController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IPrescriptionService _prescriptionService;
 
-        public PrescriptionsController(ApplicationDbContext context)
+        public PrescriptionsController(IPrescriptionService prescriptionService)
         {
-            this.context = context;
+            _prescriptionService = prescriptionService;
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddPrescription(AddPrescriptionRequest request)
         {
-            if (request.DueDate < request.Date)
+            try
             {
-                return BadRequest("DueDate cannot be earlier than Date.");
+                var prescription = await _prescriptionService.AddPrescriptionAsync(request);
+                return Ok(prescription);
             }
-
-            var patient = await context.Patients.FindAsync(request.PatientId);
-            if (patient == null)
+            catch (ArgumentException ex)
             {
-                patient = new Patient
-                {
-                    FirstName = request.PatientFirstName,
-                    LastName = request.PatientLastName,
-                    Birthdate = request.PatientBirthdate
-                };
-                context.Patients.Add(patient);
-                await context.SaveChangesAsync();
+                return BadRequest(ex.Message);
             }
-
-            var doctor = await context.Doctors.FindAsync(request.DoctorId);
-            if (doctor == null)
+            catch (Exception)
             {
-                return NotFound("Doctor not found");
+                return StatusCode(500, "An unexpected error occurred");
             }
-
-            var prescription = new Prescription
-            {
-                Date = request.Date,
-                DueDate = request.DueDate,
-                IdPatient = patient.IdPatient,
-                IdDoctor = doctor.IdDoctor
-            };
-
-            if (request.Medicaments.Count > 10)
-            {
-                return BadRequest("Prescription can include a maximum of 10 medications.");
-            }
-
-            foreach (var medicamentRequest in request.Medicaments)
-            {
-                var medicament = await context.Medicaments.FindAsync(medicamentRequest.IdMedicament);
-                if (medicament == null)
-                {
-                    return NotFound($"Medicament with number {medicamentRequest.IdMedicament} not found");
-                }
-
-                var prescriptionMedicament = new PrescriptionMedicament
-                {
-                    IdPrescription = prescription.IdPrescription,
-                    IdMedicament = medicament.IdMedicament,
-                    Dose = medicamentRequest.Dose,
-                    Details = medicamentRequest.Description
-                };
-                prescription.PrescriptionMedicaments.Add(prescriptionMedicament);
-            }
-
-            context.Prescriptions.Add(prescription);
-            await context.SaveChangesAsync();
-
-            return Ok(prescription);
         }
-    }
 
-    public class AddPrescriptionRequest
-    {
-        public int PatientId { get; set; }
-        public string PatientFirstName { get; set; }
-        public string PatientLastName { get; set; }
-        public DateTime PatientBirthdate { get; set; }
-        public int DoctorId { get; set; }
-        public DateTime Date { get; set; }
-        public DateTime DueDate { get; set; }
-        public List<MedicamentRequest> Medicaments { get; set; }
-    }
+        public class AddPrescriptionRequest
+        {
+            public int PatientId { get; set; }
+            public string PatientFirstName { get; set; }
+            public string PatientLastName { get; set; }
+            public DateTime PatientBirthdate { get; set; }
+            public int DoctorId { get; set; }
+            public DateTime Date { get; set; }
+            public DateTime DueDate { get; set; }
+            public List<MedicamentRequest> Medicaments { get; set; }
+        }
 
-    public class MedicamentRequest
-    {
-        public int IdMedicament { get; set; }
-        public int Dose { get; set; }
-        public string Description { get; set; }
+        public class MedicamentRequest
+        {
+            public int IdMedicament { get; set; }
+            public int Dose { get; set; }
+            public string Description { get; set; }
+        }
     }
 }
